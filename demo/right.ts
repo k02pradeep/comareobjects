@@ -7,6 +7,11 @@ export const right = {
     key: '1234',
     value: 'Name1',
   },
+  uObj: {
+    a: [],
+    b: [],
+    c: [],
+  },
   arr: [
     {
       key: '1234',

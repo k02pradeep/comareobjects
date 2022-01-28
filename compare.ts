@@ -64,7 +64,6 @@ export function compareObject(left, right, metadata) {
         case 0:
           if (value.type === 'array') {
             if (_.isUndefined(left[key]) && _.isUndefined(right[key])) {
-              console.log('Key not found in both : ', key);
               objDiff[key] = {
                 miss: 'both',
               };
@@ -85,7 +84,6 @@ export function compareObject(left, right, metadata) {
             }
           } else if (value.type === 'object') {
             if (_.isUndefined(left[key]) && _.isUndefined(right[key])) {
-              console.log('Key not found in both : ', key);
               objDiff[key] = {
                 miss: 'both',
               };
@@ -103,9 +101,38 @@ export function compareObject(left, right, metadata) {
                 objDiff[key] = compareData.objDiff;
               }
             }
+          } else if (value.type === 'objectArray') {
+            if (_.isUndefined(left[key]) && _.isUndefined(right[key])) {
+              objDiff[key] = {
+                miss: 'both',
+              };
+            } else {
+              const leftArr = [];
+              const rightArr = [];
+
+              _.forIn(left[key], (v, k, o) => {
+                leftArr.push({ [value.metakey]: k, [value.metavalue]: v });
+              });
+              _.forIn(right[key], (v, k, o) => {
+                rightArr.push({ [value.metakey]: k, [value.metavalue]: v });
+              });
+
+              const compareData = compareArray(leftArr, rightArr, value);
+              if (compareData.hasMismatch) {
+                hasValueMismatch = compareData.hasMismatch;
+                valueDiff.match[key] = compareData;
+              }
+              if (
+                !_.isEmpty(compareData.objDiff) &&
+                (!_.isEmpty(compareData.objDiff.left) ||
+                  !_.isEmpty(compareData.objDiff.right) ||
+                  !_.isEmpty(compareData.objDiff.mismatch))
+              ) {
+                objDiff[key] = compareData.objDiff;
+              }
+            }
           } else {
             if (_.isUndefined(left[key]) && _.isUndefined(right[key])) {
-              console.log('Key not found in both : ', key);
               objDiff[key] = {
                 miss: 'both',
               };
@@ -139,7 +166,6 @@ export function compareObject(left, right, metadata) {
         objDiff[key].right = right[key];
       }
     });
-    console.log(nKeySet);
   }
   return {
     hasMismatch: hasKeyMismatch || hasValueMismatch,
@@ -218,30 +244,30 @@ export function compareArray(left, right, metadata) {
           if (
             !(
               metadata.ignoreMissing &&
-              metadata.ignoreMissing.left &&
-              !metadata.ignoreMissing.right
+              !metadata.ignoreMissing.left &&
+              metadata.ignoreMissing.right
             )
           ) {
             keyDiff.left[key] = arrayLeft[key];
             valueDiff.left[key] = arrayLeft[key];
             hasKeyMismatch = true;
+            objDiff.left.push(arrayLeft[key]);
           }
-          objDiff.left.push(arrayLeft[key]);
 
           break;
         case 1:
           if (
             !(
               metadata.ignoreMissing &&
-              !metadata.ignoreMissing.left &&
-              metadata.ignoreMissing.right
+              metadata.ignoreMissing.left &&
+              !metadata.ignoreMissing.right
             )
           ) {
             keyDiff.right[key] = arrayRight[key];
             valueDiff.right[key] = arrayRight[key];
             hasKeyMismatch = true;
+            objDiff.right.push(arrayRight[key]);
           }
-          objDiff.right.push(arrayRight[key]);
 
           break;
         case 0:

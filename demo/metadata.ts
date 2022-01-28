@@ -12,6 +12,20 @@ export const metadata = {
       value: { type: 'string' },
     },
   },
+  uObj: {
+    type: 'objectArray',
+    item: 'object',
+    key: 'tableName',
+    metakey: 'tableName',
+    metavalue: 'keys',
+    attributes: {
+      tableName: { type: 'string' },
+      keys: {
+        type: 'array',
+        item: 'string',
+      },
+    },
+  },
   arr: {
     type: 'array',
     item: 'object',

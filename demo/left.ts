@@ -9,6 +9,11 @@ export const left = {
     value: 'Name',
     leftAttr: true,
   },
+  uObj: {
+    a: ['1', '2'],
+    b: [],
+    d: [],
+  },
   arr: [
     {
       key: '1234',
